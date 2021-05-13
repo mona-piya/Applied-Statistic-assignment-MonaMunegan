@@ -5,24 +5,225 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+surg=read.table('data/surg.dat', header = TRUE)
+kml=read.table('data/kml.dat', header = TRUE)
 ```
 
-## R Markdown
+```{r load-packages, include=FALSE}
+library(ggplot2)
+library(ggcorrplot)
+```
+# Assignment Semester 1
+## Question 1
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+A medical research team wants to investigate the survival time of patients that have a particular type of liver
+operation as part of their treatment. For each patient in the study, the following variables were recorded:
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+| || |
+| --- | --- |
+| blood | Blood clotting Index |
+| prognosis | Prognosis Index |
+| enzyme | Enzyme function Index |
+| liver | Liver function Index |
+| age | Age of the patient, in years |
+| gender | Gender of the patient, (Male of Female) |
+| survival | Survival time of the patient after surgery (in days) |
 
-```{r cars}
-summary(cars)
+
+a. Produce a scatterplot of the data and comment on the features of the data and possible relationships
+between the response and predictors and relationships between the predictors themselves.
+
+
+```{r chunkA, echo=FALSE}
+surg.new <- data.frame(surg)
+surg.new$gender <- NULL
+head(surg.new)
 ```
 
-## Including Plots
+```{r scatterplot, echo=FALSE}
+plot(surg.new)
+```
+From the Scatterplot above......
 
-You can also embed plots, for example:
+Why it is necessary to remove the gender variable to compute the correlation matrix?
+* Because the gender variable is a categorical variables. To compute the correlation matrix, every variables must be numeric.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+b. Compute the correlation matrix of the dataset and comment.
+```{r corrmatrix, echo=FALSE}
+corr <- round(cor(surg.new), 2)
+corr
+#ggcorrplot(corr, outline.col = "white", lab = TRUE, lab_size = 4, tl.cex=12, legend.title = "Correlation")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+The correlatiob matrix shows that there are moderately correlated between liver(0.67) and enzyme(0.58)
+low correlation blood(0.35)      prognosis(0.42) 
+The correlation between survival and age is -0.12, which is close to 0, indicates that no linear relationship between these variables.
+
+c. Fit a model using all the predictors to explain the survival response
+
+* Write down the mathematical multiple regression model for this situation, defining all appropriate
+parameters.
+```{r c1, echo=FALSE}
+
+```
+
+* Write down the Hypotheses for the Overall ANOVA test of multiple regression.
+```{r c2, echo=FALSE}
+
+
+```
+* Produce an ANOVA table for the overall multiple regression model (One combined regression SS
+source is sufficient).
+```{r c3, echo=FALSE}
+surg.lm1 = lm(survival ~ blood  + prognosis  + enzyme  + liver + age, data = surg.new)
+#par(mfrow = c(1, 2))
+#plot(surg.lm1, which=1:2)
+
+#clean the outlier
+surg.new = surg.new[-c(5, 28),]
+
+#Fitting the regression using all variables
+surg.lm1 = lm(survival ~ blood  + prognosis  + enzyme  + liver + age, data = surg.new)
+
+#ANOVA table for all variables
+anova(surg.lm1)
+```
+
+* Compute the F statistic for this test.
+```{r c4, echo=FALSE}
+summary(surg.lm1)
+```
+* State the Null distribution.
+* Compute the P-Value
+* State your conclusion (both statistical conclusion and contextual conclusion).
+
+```{r c5, echo=FALSE}
+#par(mfrow = c(1, 2))
+#plot(surg.lm1, which = 1:2)
+#par(mfrow = c(2, 2))
+#plot(resid(surg.lm1) ~ blood  + prognosis  + enzyme  + liver + age, data = surg.new)
+```
+
+
+
+d. Using model selection procedures discussed in the course, find the best multiple regression model that
+explains the data.
+
+Removing one none significant variable (if there are many none significant vars, pick the largest P-value)
+Remove liver P-value = 0.437595
+
+```{r lm2, echo=FALSE}
+surg.lm2 = lm(survival ~ blood  + prognosis  + enzyme  + age, data = surg.new)
+summary(surg.lm2)
+```
+Removing one none significant variable (if there are many none significant vars, pick the largest P-value)
+Remove age P-value = 0.298
+
+```{r lm3, echo=FALSE}
+surg.lm3 = lm(survival ~ blood  + prognosis  + enzyme, data = surg.new)
+summary(surg.lm3)
+```
+
+e. Validate your final model and comment why it is not appropriate to use the multiple regression model
+to explain the survival time.
+
+
+```{r e, echo=FALSE}
+par(mfrow = c(1, 2))
+plot(surg.lm3, which = 1:2)
+par(mfrow = c(1, 3))
+plot(resid(surg.lm3) ~ blood  + prognosis  + enzyme, data = surg.new)
+```
+
+
+surg.lm3 is final model
+
+### Transformation
+
+f. Re-fit the model using log(survival) as the new response variable. In your answer,
+* Use the model selection procedure discussed in the course starting with log(survival) as the
+response and start with all the predictors.
+
+```{r log lm1, echo=FALSE}
+#Adding in the log transformed variables.
+surg.new$logsurvival = log(surg.new$survival)
+surg.new$logblood = log(surg.new$blood)
+surg.new$logprognosis = log(surg.new$prognosis)
+surg.new$logenzyme = log(surg.new$enzyme)
+surg.new$logliver = log(surg.new$liver)
+surg.new$logage = log(surg.new$age)
+head(surg.new)
+
+#Fitting the regression on the log transformed predictors.
+surglog.lm1 = lm(logsurvival ~ logblood + logprognosis + logenzyme + logliver + logage, data = surg.new)
+summary(surglog.lm1)
+```
+Removing one none significant variable (if there are many none significant vars, pick the largest P-value)
+Remove logage P-value = 0.4551
+
+```{r log lm2, echo=FALSE}
+surglog.lm2 = lm(logsurvival ~ logblood + logprognosis + logenzyme + logliver, data = surg.new)
+summary(surglog.lm2)
+```
+Removing one none significant variable (if there are many none significant vars, pick the largest P-value)
+Remove logliver P-value = 0.1252
+
+```{r log lm3, echo=FALSE}
+surglog.lm3 = lm(logsurvival ~ logblood + logprognosis + logenzyme, data = surg.new)
+summary(surglog.lm3)
+```
+g. Validate your final model with the log(survival) response. In particular, in your answer,
+
+
+```{r log g, echo=FALSE}
+par(mfrow = c(1, 2))
+plot(surglog.lm3, which = 1:2)
+par(mfrow = c(1, 3))
+plot(resid(surglog.lm3) ~ logblood + logprognosis + logenzyme, data = surg.new)
+```
+
+* Explain why the regression model with log(survival) response variable is superior to the model
+with the survival response variable
+
+The final model  is surglog.lm3
+
+
+
+
+## Question 2
+
+A car manufacturer wants to study the fuel efficiency of a new car engine. It wishes to account for any
+differences between the driver and production variation. The manufacturer randomly selects 5 cars from the
+production line and recruits 4 different test drivers.
+
+| || |
+| --- | --- |
+| kmL | The observed efficiency of the car in km/L over a standard course |
+| car | The specific car (labelled 1, 2, 3, 4 or 5) |
+| driver | The driver of the car (labelled A, B, C, D) |
+
+
+a. For this study, is the design balanced or unbalanced? Explain why.
+```{r kml, echo=FALSE}
+kml
+```
+This study is balanced because .......
+
+b. Construct two different preliminary graphs that investigate different features of the data and comment.
+
+
+c. Analyse the data, stating null and alternative hypothesis for each test, and check assumptions.
+
+
+d. State your conclusions about the effect of driver and car on the efficiency kmL. These conclusions are
+only required to be at the qualitative level and can be based off the outcomes of the hypothesis tests in
+
+
+c. and the preliminary plots in b.. You do not need to statistically examine the multiple comparisons
+between contrasts and interactions.
+
+
+
+
