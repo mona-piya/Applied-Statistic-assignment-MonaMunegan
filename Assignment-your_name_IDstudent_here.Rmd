@@ -33,51 +33,69 @@ operation as part of their treatment. For each patient in the study, the followi
 a. Produce a scatterplot of the data and comment on the features of the data and possible relationships
 between the response and predictors and relationships between the predictors themselves.
 
-
 ```{r chunkA, echo=FALSE}
 surg.new <- data.frame(surg)
 surg.new$gender <- NULL
-head(surg.new)
+#head(surg.new)
 ```
+
+&nbsp;
 
 ```{r scatterplot, echo=FALSE}
 plot(surg.new)
 ```
-From the Scatterplot above......
 
+There are moderate correlation between survival and enzyme and liver. Slight correlation between survival and prognosis.
+\
+&nbsp;
+\
+&nbsp;
 Why it is necessary to remove the gender variable to compute the correlation matrix?
-* Because the gender variable is a categorical variables. To compute the correlation matrix, every variables must be numeric.
 
+Because the gender variable is a categorical variables. To compute the correlation matrix, every variables must be numeric.
 
+&nbsp;
 b. Compute the correlation matrix of the dataset and comment.
+&nbsp;
 ```{r corrmatrix, echo=FALSE}
 corr <- round(cor(surg.new), 2)
 corr
 #ggcorrplot(corr, outline.col = "white", lab = TRUE, lab_size = 4, tl.cex=12, legend.title = "Correlation")
 ```
+&nbsp;
 
+The correlatiob matrix shows that there are moderately correlated between survival and liver(0.67) and enzyme(0.58).
+Low correlation between survival and blood(0.35) and prognosis(0.42). The correlation between survival and age is -0.12, 
+which is close to 0, indicates that no linear relationship between these variables.
 
-The correlatiob matrix shows that there are moderately correlated between liver(0.67) and enzyme(0.58)
-low correlation blood(0.35)      prognosis(0.42) 
-The correlation between survival and age is -0.12, which is close to 0, indicates that no linear relationship between these variables.
-
+&nbsp;
 c. Fit a model using all the predictors to explain the survival response
 
+```{r c1, echo=FALSE}
+surg.lm1 = lm(survival ~ blood  + prognosis  + enzyme  + liver + age, data = surg.new)
+coefficients(surg.lm1)
+```
 * Write down the mathematical multiple regression model for this situation, defining all appropriate
 parameters.
-```{r c1, echo=FALSE}
-
-```
+\
+&nbsp;
+\[\hat{survival} = -630.654734 + 29.257285blood + 8.036109prognosis  + 8.060826enzyme 
+\]
+\[    + 39.452521liver -2.183841age
+\]
+\
+&nbsp;
 
 * Write down the Hypotheses for the Overall ANOVA test of multiple regression.
-```{r c2, echo=FALSE}
+\
+&nbsp;
+$\text{Hypotheses} \quad H_0:   \beta_{1} = \beta_{2} = ... = \beta_{k} = 0 \quad\text{against} \quad H_1: \beta_{i} \neq 0 \quad\text{for at least one i (not all } \beta_{i} \quad\text{parameters are zero)}$
+\
+&nbsp;
 
+* Produce an ANOVA table for the overall multiple regression model (One combined regression SS source is sufficient).
 
-```
-* Produce an ANOVA table for the overall multiple regression model (One combined regression SS
-source is sufficient).
-```{r c3, echo=FALSE}
-surg.lm1 = lm(survival ~ blood  + prognosis  + enzyme  + liver + age, data = surg.new)
+```{r anova1, echo=FALSE}
 #par(mfrow = c(1, 2))
 #plot(surg.lm1, which=1:2)
 
@@ -90,55 +108,116 @@ surg.lm1 = lm(survival ~ blood  + prognosis  + enzyme  + liver + age, data = sur
 #ANOVA table for all variables
 anova(surg.lm1)
 ```
+\
+&nbsp;
+\
+&nbsp;
 
 * Compute the F statistic for this test.
-```{r c4, echo=FALSE}
-summary(surg.lm1)
-```
+\
+&nbsp;
+\[
+Full RegSS = RegSS_{blood} + RegSS_{prognosis \mid blood} + RegSS_{enzyme\mid blood \& prognosis} 
+\]
+\[
+              \quad + RegSS_{liver|blood\&prognosis\&enzyme} + RegSS_{age|blood\&prognosis\&enzyme\&liver}
+\]
+$Full RegSS = 78517 + 875224 + 1552773 + 56436 + 31888 = 2594838$
+\
+&nbsp;
+\
+&nbsp;
+$RegMS = \frac{RegSS}{k} = \frac{2594838}{5} = 518967.6$
+\
+&nbsp;
+\
+&nbsp;
+$\text{Test statistic:}\quad  F_{obs} = \frac{RegMS}{ResMS} = \frac{518967.6}{23397} = 22.18095$
+\
+&nbsp;
+
 * State the Null distribution.
+\
+&nbsp;
+$\text{Hypotheses} \quad H_0:   \beta_{blood} = \beta_{prognosis} = \beta_{enzyme} = \beta_{liver} = \beta_{age} = 0 \quad\text{against} \quad H_1: \text{not all}\quad \beta_{i} = 0$
+\
+&nbsp;
+
 * Compute the P-Value
+\
+&nbsp;
+$\text{P-Value:}\quad P(F_{5,42} >= 22.18095) = 8.215602e-11 < 0.05$
+
+
 * State your conclusion (both statistical conclusion and contextual conclusion).
+\
+&nbsp;
+P-value is 8.215602e-11, Reject H0.
 
-```{r c5, echo=FALSE}
-#par(mfrow = c(1, 2))
-#plot(surg.lm1, which = 1:2)
-#par(mfrow = c(2, 2))
-#plot(resid(surg.lm1) ~ blood  + prognosis  + enzyme  + liver + age, data = surg.new)
-```
-
-
+* There is a significant linear relationship between survival and at least one of the five predictor variables.
+\
+&nbsp;
 
 d. Using model selection procedures discussed in the course, find the best multiple regression model that
 explains the data.
-
-Removing one none significant variable (if there are many none significant vars, pick the largest P-value)
+```{r ml1, echo=FALSE}
+summary(surg.lm1)
+```
+\
+&nbsp;
+Removing one none significant variable (if there are many none significant vars, pick the largest P-value).
 Remove liver P-value = 0.437595
+\
+&nbsp;
 
 ```{r lm2, echo=FALSE}
 surg.lm2 = lm(survival ~ blood  + prognosis  + enzyme  + age, data = surg.new)
 summary(surg.lm2)
 ```
-Removing one none significant variable (if there are many none significant vars, pick the largest P-value)
+\
+&nbsp;
+Removing one none significant variable (if there are many none significant vars, pick the largest P-value).
 Remove age P-value = 0.298
+\
+&nbsp;
 
 ```{r lm3, echo=FALSE}
 surg.lm3 = lm(survival ~ blood  + prognosis  + enzyme, data = surg.new)
 summary(surg.lm3)
 ```
 
+\
+&nbsp;
 e. Validate your final model and comment why it is not appropriate to use the multiple regression model
 to explain the survival time.
-
+\
+&nbsp;
 
 ```{r e, echo=FALSE}
+#Check diagnostics
 par(mfrow = c(1, 2))
 plot(surg.lm3, which = 1:2)
+#Check residuals against predictors
 par(mfrow = c(1, 3))
 plot(resid(surg.lm3) ~ blood  + prognosis  + enzyme, data = surg.new)
 ```
-
-
-surg.lm3 is final model
+\
+&nbsp;
+For the final model(surg.lm3):
+\
+&nbsp;
+1. The Normal Q-Q plot of residuals has slight curvature but close to normally distributed. ???
+\
+&nbsp;
+2. The residuals vs fitted shows fan pattern. ???
+\
+&nbsp;
+3. Residuals vs predictor plots ???
+\
+&nbsp;
+So Transform response....
+\
+&nbsp;
 
 ### Transformation
 
@@ -160,23 +239,34 @@ head(surg.new)
 surglog.lm1 = lm(logsurvival ~ logblood + logprognosis + logenzyme + logliver + logage, data = surg.new)
 summary(surglog.lm1)
 ```
-Removing one none significant variable (if there are many none significant vars, pick the largest P-value)
+\
+&nbsp;
+Removing one none significant variable (if there are many none significant vars, pick the largest P-value).
 Remove logage P-value = 0.4551
+\
+&nbsp;
 
 ```{r log lm2, echo=FALSE}
 surglog.lm2 = lm(logsurvival ~ logblood + logprognosis + logenzyme + logliver, data = surg.new)
 summary(surglog.lm2)
 ```
-Removing one none significant variable (if there are many none significant vars, pick the largest P-value)
+\
+&nbsp;
+Removing one none significant variable (if there are many none significant vars, pick the largest P-value).
 Remove logliver P-value = 0.1252
+\
+&nbsp;
 
 ```{r log lm3, echo=FALSE}
 surglog.lm3 = lm(logsurvival ~ logblood + logprognosis + logenzyme, data = surg.new)
 summary(surglog.lm3)
 ```
+\
+&nbsp;
 g. Validate your final model with the log(survival) response. In particular, in your answer,
 
-
+\
+&nbsp;
 ```{r log g, echo=FALSE}
 par(mfrow = c(1, 2))
 plot(surglog.lm3, which = 1:2)
@@ -184,12 +274,16 @@ par(mfrow = c(1, 3))
 plot(resid(surglog.lm3) ~ logblood + logprognosis + logenzyme, data = surg.new)
 ```
 
+\
+&nbsp;
+
 * Explain why the regression model with log(survival) response variable is superior to the model
 with the survival response variable
+\
+The residuals vs fitted looks better for the log transformed response.?????
 
-The final model  is surglog.lm3
-
-
+\
+&nbsp;
 
 
 ## Question 2
@@ -206,24 +300,103 @@ production line and recruits 4 different test drivers.
 
 
 a. For this study, is the design balanced or unbalanced? Explain why.
-```{r kml, echo=FALSE}
-kml
+```{r kml_a, echo=FALSE}
+with(kml, table(driver, car))
 ```
-This study is balanced because .......
+This is a balanced design because there is the same no. of replicates for each treatment combinations.
 
 b. Construct two different preliminary graphs that investigate different features of the data and comment.
+&nbsp;
+```{r kml_b1, echo=FALSE}
+with(kml, interaction.plot(driver, car, kmL))
+#with(kml, interaction.plot(car, driver, kmL))
+```
+As the lines are not parallel, interaction could be there.
 
+&nbsp;
 
+```{r kml_b2, echo=FALSE}
+par(mfrow = c(1, 2))
+boxplot(kmL  ~ driver, data = kml)
+boxplot(kmL  ~ car, data = kml)
+#boxplot(kmL  ~ driver + car, data = kml)
+
+```
+For the boxplots, there are similar spread for driver and car.
+
+&nbsp;
 c. Analyse the data, stating null and alternative hypothesis for each test, and check assumptions.
 
 
+```{r kml_c1, echo=FALSE}
+#Two-way ANOVA with interaction effect
+anova.klm1 <- aov(kmL ~ driver * car, data = kml)
+summary(anova.klm1)
+```
+&nbsp;
+
+Model: $Y = \mu + \alpha_i + \beta_j + \gamma_{ij} + \epsilon_{ijk}$
+
+  where $\epsilon_{ijk}$ are $N(0, \sigma^2)$ random variables
+  
+$\mu:$ overall population mean
+
+$\alpha_i:$ main effect on driver
+
+$\beta_j:$ main effect on car
+
+$\gamma_{ij}:$ interaction effect between driver and car
+
+$\epsilon_{ijk}:$ error term
+
+  
+Hypotheses $\quad H_0:   \gamma_{ij} = 0 \quad\text{against} \quad H_1: \text{at least one}\quad \gamma_{ij} \text{ non-zero}$
+
+
+Because P-value = 0.371 >  0.05, $\quad\gamma_{ij}$ is not significant.
+\
+&nbsp; 
+No evidence to suggest that the two factors (driver and car) are not independent.
+\
+&nbsp;
+As interaction is not significant, re-fit the model with main effects only.
+
+&nbsp;
+```{r kml_c2, echo=FALSE}
+#Two-way ANOVA
+anova.klm2 <- aov(kmL ~ driver + car, data = kml)
+summary(anova.klm2)
+```
+
+&nbsp;
+
+Model: $y_{ijk} = \mu + \alpha_i + \beta_j + \epsilon_{ijk}$
+
+Hypotheses : $\quad H_0: \beta_j = 0 \quad\text{against} \quad H_1: \text{at least one} \quad \beta_j \text{ non-zero }$
+
+Both the driver and car effects are highly significant (P-Value < 0.001)
+&nbsp;
+
+```{r kml_c3, echo=FALSE}
+par(mfrow = c(1, 2))
+plot(anova.klm2, 1:2)
+
+```
+
+* Residuals vs Fitted plot shows negligible pattern, variability among residuals vs fitted is not constant.
+
+* The quantile plot of residuals follows a linear trend, residuals look close to normally distributed.
+\
+&nbsp;
+
 d. State your conclusions about the effect of driver and car on the efficiency kmL. These conclusions are
 only required to be at the qualitative level and can be based off the outcomes of the hypothesis tests in
-
-
-c. and the preliminary plots in b.. You do not need to statistically examine the multiple comparisons
-between contrasts and interactions.
-
-
+c. and the preliminary plots in b.. 
+You do not need to statistically examine the multiple comparisons between contrasts and interactions.
+\
+&nbsp;
+The p-value for the effects of driver and car are less than the significant level 0.05,
+we have evidence to reject $H_0$. 
+and the quantile plot looks linear and residual plots have no pattern, suggesting linear model adequate. ????
 
 
