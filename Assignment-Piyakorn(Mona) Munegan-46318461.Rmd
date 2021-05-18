@@ -86,28 +86,12 @@ plot(surg.lm1, which=1:2)
 ```
 \
 &nbsp;
-5 and 28 are significant outliers, need to be remove.
-\
-&nbsp;
 
 * Produce an ANOVA table for the overall multiple regression model (One combined regression SS source is sufficient).
-
+\
+&nbsp;
 ```{r c3, echo=FALSE}
-#clean the outlier
-surg.new = surg.new[-c(5, 28),]
-#Fitting linear model with cleaned data
-surg.lm1 = lm(survival ~ blood  + prognosis  + enzyme  + liver + age + gender, data = surg.new)
-par(mfrow = c(1, 2))
-plot(surg.lm1, which=1:2)
-```
-\
-&nbsp;
-After cleaning outliers, The normal Q-Q plot looks better as each point falls quite close to the line. Although there is a pattern in residuals vs fitted plot.
-\
-&nbsp;
-```{r c4, echo=FALSE}
 #Fitting the regression using all variables
-surg.lm1 = lm(survival ~ blood  + prognosis  + enzyme  + liver + age + gender, data = surg.new)
 coefficients(surg.lm1)
 ```
 
@@ -115,15 +99,15 @@ coefficients(surg.lm1)
 parameters.
 \
 &nbsp;
-\[\hat{survival} = -595.240879 + 31.568219blood + 8.059842prognosis  + 8.087624enzyme 
+\[\hat{survival} = -1179.1888797 + 86.6437068blood + 8.5012606prognosis  + 11.1245627enzyme 
 \]
-\[    + 31.028299liver - 2.316786age - 42.186475gender
+\[    + 38.5068155liver - 0.2201138age - 0.2201138 gender
 \]
 
 * Write down the Hypotheses for the Overall ANOVA test of multiple regression.
 \
 &nbsp;
-\[H_0:   \beta_{1} = \beta_{2} = ... = \beta_{k} = 0;
+\[H_0:   \beta_{1} = \beta_{2} = \beta_{3} = \beta_{4} = \beta_{5} = 0;
 \]
 \[H_1: \beta_{i} \neq 0 \quad\text{for at least one i (not all } \beta_{i} \quad\text{parameters are zero)}
 \]
@@ -150,17 +134,17 @@ Full RegSS = RegSS_{blood} + RegSS_{prognosis \mid blood} + RegSS_{enzyme\mid bl
 \[
               \quad + RegSS_{liver|blood\&prognosis\&enzyme} + RegSS_{age|blood\&prognosis\&enzyme\&liver} + RegSS_{gender|blood\&prognosis\&enzyme\&liver\&age}
 \]
-$Full RegSS = 12670 + 1118269 + 1692481 + 58863 + 28117 + 20450 = 2930850$
+$Full RegSS = 1005152 + 1278496 + 3442172 + 57862 + 33032 + 1 = 5816715$
 \
 &nbsp;
 \
 &nbsp;
-$RegMS = \frac{RegSS}{k} = \frac{2930850}{6} = 488475$
+$RegMS = \frac{RegSS}{k} = \frac{5816715}{6} = 969452.5$
 \
 &nbsp;
 \
 &nbsp;
-$\text{Test statistic:}\quad  F_{obs} = \frac{RegMS}{ResMS} = \frac{488475}{21978} = 22.22563$
+$\text{Test statistic:}\quad  F_{obs} = \frac{RegMS}{ResMS} = \frac{969452.5}{54315} = 17.84871$
 \
 &nbsp;
 
@@ -177,16 +161,16 @@ H_1: \text{not all}\quad \beta_{i} = 0
 * Compute the P-Value
 ```{r p_value, echo=FALSE}
 #compute P-value from F-statistic
-pf(22.22563, 6, 45, lower.tail = FALSE)
+pf(17.84871, 6, 47, lower.tail = FALSE)
 ```
 \
 &nbsp;
-$\text{P-Value:}\quad P(F_{6,45} >= 22.22563) = 5.788194e-12 < 0.05$
+$\text{P-Value:}\quad P(F_{6,47} >= 17.84871) = 1.190218e-10 < 0.05$
 
 * State your conclusion (both statistical conclusion and contextual conclusion).
 \
 &nbsp;
-P-value is 5.788194e-12, Reject H0.
+P-value is 1.190218e-10, Reject H0.
 
 * There is a significant linear relationship between survival and at least one of the five predictor variables.
 \
@@ -195,34 +179,34 @@ P-value is 5.788194e-12, Reject H0.
 d. Using model selection procedures discussed in the course, find the best multiple regression model that
 explains the data.
 ```{r lm1, echo=FALSE}
-summary(surg.lm1)$coefficients
+summary(surg.lm1)
 ```
 \
 &nbsp;
 Removing one none significant variable (if there are many none significant vars, pick the largest P-value).
-Remove liver P-value = 0.35255
+Remove gender  P-value = 0.997413
 \
 &nbsp;
 
 ```{r lm2, echo=FALSE}
-surg.lm2 = lm(survival ~ blood  + prognosis  + enzyme + age + gender, data = surg.new)
+surg.lm2 = lm(survival ~ blood  + prognosis  + enzyme  + liver + age, data = surg.new)
 summary(surg.lm2)$coefficients
 ```
 \
 &nbsp;
 Removing one none significant variable (if there are many none significant vars, pick the largest P-value).
-Remove gender P-value = 0.21426
+Remove age P-value = 0.4345
 \
 &nbsp;
 
 ```{r lm3, echo=FALSE}
-surg.lm3 = lm(survival ~ blood  + prognosis  + enzyme + age, data = surg.new)
+surg.lm3 = lm(survival ~ blood  + prognosis  + enzyme  + liver, data = surg.new)
 summary(surg.lm3)$coefficients
 ```
 \
 &nbsp;
 Removing one none significant variable (if there are many none significant vars, pick the largest P-value).
-Remove age P-value = 0.128046
+Remove liver P-value = 0.30018    
 \
 &nbsp;
 ```{r lm4, echo=FALSE}
@@ -272,7 +256,7 @@ summary(surglog.lm1)$coefficients
 \
 &nbsp;
 Removing one none significant variable (if there are many none significant vars, pick the largest P-value).
-Remove liver P-value = 0.8832
+Remove liver P-value = 0.95503
 \
 &nbsp;
 
@@ -283,7 +267,7 @@ summary(surglog.lm2)$coefficients
 \
 &nbsp;
 Removing one none significant variable (if there are many none significant vars, pick the largest P-value).
-Remove gender P-value = 0.2023
+Remove gender P-value = 0.3472615
 \
 &nbsp;
 
@@ -294,7 +278,7 @@ summary(surglog.lm3)$coefficients
 \
 &nbsp;
 Removing one none significant variable (if there are many none significant vars, pick the largest P-value).
-Remove age P-value = 0.1034
+Remove age P-value = 0.1232646
 \
 &nbsp;
 
@@ -322,9 +306,7 @@ with the survival response variable
 \
 From above picture show the residual vs fitted plot and the normal Q-Q plot for the log(survival) response.
 Comparing with the final model of the survival response, the normality assumption within the log(survival) model
-is better as this can be shown in the residuals vs fitted plot.
-
-The normal Q-Q plot has some linearity but not the fitted value one....
+is better as this can be shown in the residuals vs fitted plot. The normal Q-Q plot is close to normally distributed.
 
 Overall, by comparing the multiple regression assumptions of both log(survival) and survival response, it clarifies
 the reason why log(survival) is superior to the other response.
