@@ -36,7 +36,6 @@ between the response and predictors and relationships between the predictors the
 ```{r corr, echo=FALSE}
 surg.cor <- data.frame(surg)
 surg.cor$gender <- NULL
-#head(surg.new)
 ```
 
 &nbsp;
@@ -64,7 +63,7 @@ corr
 ```
 \
 &nbsp;
-The correlation matrix shows that there are moderately correlated between survival and liver(0.67) and enzyme(0.58).
+The correlation matrix shows that there are moderate correlation between survival and liver(0.67) and enzyme(0.58).
 Low correlation between survival and blood(0.35) and prognosis(0.42). The correlation between survival and age is -0.12, 
 which is close to 0, indicates that no linear relationship between these variables.
 \
@@ -103,7 +102,7 @@ plot(surg.lm1, which=1:2)
 ```
 \
 &nbsp;
-After cleaning outliers....
+After cleaning outliers, The normal Q-Q plot looks better as each point falls quite close to the line. Although there is a pattern in residuals vs fitted plot.
 \
 &nbsp;
 ```{r c4, echo=FALSE}
@@ -243,28 +242,20 @@ to explain the survival time.
 par(mfrow = c(1, 2))
 plot(surg.lm4, which = 1:2)
 #Check residuals against predictors
-par(mfrow = c(1, 3))
-plot(resid(surg.lm4) ~ blood + prognosis  + enzyme, data = surg.new)
+#(mfrow = c(1, 3))
+#plot(resid(surg.lm4) ~ blood + prognosis  + enzyme, data = surg.new)
 ```
 \
 &nbsp;
-For the final model(surg.lm4):
-\
-&nbsp;
-1. The Normal Q-Q plot of residuals has slight curvature but close to normally distributed. ???
-\
-&nbsp;
-2. The residuals vs fitted shows fan pattern. ???
-\
-&nbsp;
-3. Residuals vs predictor plots ???
-\
-&nbsp;
-So Transform response....
+From above picture show the residual vs fitted plot and the normal Q-Q plot for the final model of the survival response(surg.lm4). 
+The linearity of the points in the normal Q-Q plot suggests that the data are close to normally distributed. 
+However, the residuals vs fitted plot has a fan pattern.
+This is the reason why this final model is not appropriate to use the multiple regression model to explain the survival time.
+In this case, In this transformation the response variable is needed.
+
 \
 &nbsp;
 
-### Transformation
 
 f. Re-fit the model using log(survival) as the new response variable. In your answer,
 * Use the model selection procedure discussed in the course starting with log(survival) as the
@@ -320,8 +311,8 @@ g. Validate your final model with the log(survival) response. In particular, in 
 ```{r validatelog1, echo=FALSE}
 par(mfrow = c(1, 2))
 plot(surglog.lm4, which = 1:2)
-par(mfrow = c(1, 3))
-plot(resid(surglog.lm4) ~ blood + prognosis + enzyme, data = surg.new)
+#par(mfrow = c(1, 3))
+#plot(resid(surglog.lm4) ~ blood + prognosis + enzyme, data = surg.new)
 ```
 \
 &nbsp;
@@ -329,10 +320,19 @@ plot(resid(surglog.lm4) ~ blood + prognosis + enzyme, data = surg.new)
 * Explain why the regression model with log(survival) response variable is superior to the model
 with the survival response variable
 \
-The residuals vs fitted looks better for the log transformed response.?????
+From above picture show the residual vs fitted plot and the normal Q-Q plot for the log(survival) response.
+Comparing with the final model of the survival response, the normality assumption within the log(survival) model
+is better as this can be shown in the residuals vs fitted plot.
+
+The normal Q-Q plot has some linearity but not the fitted value one....
+
+Overall, by comparing the multiple regression assumptions of both log(survival) and survival response, it clarifies
+the reason why log(survival) is superior to the other response.
 
 \
 &nbsp;
+
+
 
 
 ## Question 2
@@ -432,20 +432,23 @@ plot(anova.klm2, 1:2)
 
 ```
 
-* Residuals vs Fitted plot shows negligible pattern, variability among residuals vs fitted is not constant.
+* Residuals vs Fitted plot shows a negligible pattern, variability among residuals vs fitted is not constant.
+There are several outliers, with residuals close to 0.4.
 
-* The quantile plot of residuals follows a linear trend, residuals look close to normally distributed.
+* The normal Q-Q plot of residuals follows a linear trend, residuals look close to normally distributed.
 \
 &nbsp;
+
 
 d. State your conclusions about the effect of driver and car on the efficiency kmL. These conclusions are
 only required to be at the qualitative level and can be based off the outcomes of the hypothesis tests in
 c. and the preliminary plots in b.. 
 You do not need to statistically examine the multiple comparisons between contrasts and interactions.
+
 \
 &nbsp;
 The p-value for the effects of driver and car are less than the significant level 0.05,
 we have evidence to reject $H_0$. 
-and the quantile plot looks linear and residual plots have no pattern, suggesting linear model adequate. ????
+Moreover, the normal Q-Q plot follows a linear trend and residual plots have no pattern, suggesting linear model adequate.
 
 
