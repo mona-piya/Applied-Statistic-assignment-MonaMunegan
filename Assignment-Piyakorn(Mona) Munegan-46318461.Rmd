@@ -173,7 +173,7 @@ $\text{P-Value:}\quad P(F_{6,47} >= 17.84871) = 1.190218e-10 < 0.05$
 &nbsp;
 P-value is 1.190218e-10. As P-value < 0.05, reject $H_0$.
 
-* There is a significant linear relationship between survival and at least one of the five predictor variables.
+\quad \quad There is a significant linear relationship between survival and at least one of the five predictor variables.
 \
 &nbsp;
 
