@@ -12,7 +12,7 @@ kml=read.table('data/kml.dat', header = TRUE)
 ```{r load-packages, include=FALSE}
 library(ggplot2)
 ```
-
+# STAT6180-Applied Statistic
 # Assignment Semester 1
 ## Question 1
 
